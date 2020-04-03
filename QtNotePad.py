@@ -15,12 +15,13 @@ class QtNotePad(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
         # self refers to QMainWindow
-
+        self.filename = None
         self.te_main = QTextEdit(self)
         self.setWindowTitle("QtNotePad")
         self.setGeometry(100,100,500,500)
         self.setMinimumSize(200, 200)
         self.buildUi()
+
 
 
     def buildUi(self):
@@ -30,7 +31,12 @@ class QtNotePad(QMainWindow):
 
         new_menu = QAction('New', self)
         new_menu.setShortcut('Ctrl+N')
-        new_menu.triggered.connect(self.clear_window)
+        new_menu.triggered.connect(self.new)
+
+        open_menu = QAction('Open', self)
+        open_menu.setShortcut('Ctrl+O')
+        open_menu.triggered.connect(self.open)
+        file_menu.addAction((open_menu))
         file_menu.addAction(new_menu)
 
         save_menu = QAction('Save', self)
@@ -46,7 +52,7 @@ class QtNotePad(QMainWindow):
         theme_menu = QAction('Theme', self)
         edit_menu.addAction(comment_menu)
 
-        default_style = "font: 12pt 'Hack'; color: #dddddd; background-color: #111111;"
+        default_style = "font: 12pt 'Hack'; color: #111111;"
         self.te_main.setStyleSheet(default_style)
 
         # Setting a vertical box layout
@@ -59,29 +65,49 @@ class QtNotePad(QMainWindow):
         centralWidget.setLayout(vertical_box)
         self.setCentralWidget(centralWidget)
 
-    def clear_window(self):
+    def new(self):
+        self.filename = None
         self.te_main.setPlainText("")
+
+    def open(self):
+        self.te_main.setPlainText("")
+        open_file = QFileDialog.getOpenFileName(self, 'Open')
+        self.filename = open_file[0]
+        try:
+            o = open(self.filename, "r")
+            content = o.read()
+            self.te_main.setPlainText(content)
+            o.close()
+        except Exception:
+            print()
+        self.post_save()
+
+            
+
     def comment(self):
         self.te_main.insertHtml("# ")
+
     def save(self):
-        save_file = QFileDialog.getSaveFileName(self, 'Save',)
+        save_file = QFileDialog.getSaveFileName(self, 'Save')
         text_to_save = self.te_main.toPlainText()
-        print(save_file[0])
+        self.filename = save_file[0]
         try:
-            f = open(save_file[0], "w+")
+            f = open(self.filename, "w+")
             f.write(text_to_save)
             f.close()
         except Exception:
-            print(Exception)
-        self.post_save(save_file[0])
-    def post_save(self, filename):
-        window_title = "QtNotePad - " + filename
+            pass
+        self.post_save()
+
+    def post_save(self):
+        window_title = "QtNotePad - " + self.filename
         self.setWindowTitle(window_title)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setStyle('Fusion')
     main_window = QtNotePad()
+    main_window.setWindowIcon(QIcon("logo.png"))
     main_window.show()
     sys.exit(app.exec_())
 
