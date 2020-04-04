@@ -2,7 +2,7 @@
 **author** Peppercorn
 
 ```python
-print("Hello Visitor! Welcome to Peppercorn Notepad v2020.APR")
+print("Hello Visitor! Welcome to Peppercorn Notepad build 2020.APR")
 ```
 ## About
 This is a simple notepad made using **Python** and **PyQt5**. 
