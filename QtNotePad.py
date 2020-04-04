@@ -9,8 +9,8 @@
 """
 
 from PyQt5.QtWidgets import QWidget, QApplication, QMainWindow, QTextEdit, QVBoxLayout, QAction, QFileDialog
-from PyQt5.QtWidgets import QPushButton, QMessageBox
-from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QMessageBox, QFontDialog
+from PyQt5.QtGui import QIcon, QFont
 import sys
 
 
@@ -19,9 +19,10 @@ class QtNotePad(QMainWindow):
         QMainWindow.__init__(self)
         # self refers to QMainWindow
         self.filename = None
+        self.file_open = False
         self.te_main = QTextEdit(self)
         self.setWindowTitle("Peppercorn Notepad")
-        self.setGeometry(100, 100, 500, 500)
+        self.setGeometry(100, 100, 800, 500)
         self.setMinimumSize(200, 200)
         self.build_ui()
 
@@ -33,12 +34,13 @@ class QtNotePad(QMainWindow):
         new_menu = QAction('New', self)
         new_menu.setShortcut('Ctrl+N')
         new_menu.triggered.connect(self.new)
+        file_menu.addAction(new_menu)
 
         open_menu = QAction('Open', self)
         open_menu.setShortcut('Ctrl+O')
         open_menu.triggered.connect(self.open)
         file_menu.addAction(open_menu)
-        file_menu.addAction(new_menu)
+
 
         save_menu = QAction('Save', self)
         save_menu.setShortcut('Ctrl+S')
@@ -46,19 +48,38 @@ class QtNotePad(QMainWindow):
         file_menu.addAction(save_menu)
 
         edit_menu = menu_bar.addMenu("Edit")
+
         comment_menu = QAction('Comment', self)
         comment_menu.setShortcut('Ctrl+/')
         comment_menu.triggered.connect(self.comment)
         edit_menu.addAction(comment_menu)
+
+        copy_menu = QAction('Copy', self)
+        copy_menu.setShortcut('Ctrl+C')
+        copy_menu.triggered.connect(self.copy)
+        edit_menu.addAction(copy_menu)
+
+        cut_menu = QAction('Cut', self)
+        cut_menu.setShortcut('Ctrl+X')
+        cut_menu.triggered.connect(self.cut)
+        edit_menu.addAction(cut_menu)
+
+        paste_menu = QAction('Paste', self)
+        paste_menu.setShortcut('Ctrl+V')
+        paste_menu.triggered.connect(self.paste)
+        edit_menu.addAction(paste_menu)
+
+        preference_menu = edit_menu.addMenu('Preferences')
+
+        font_menu = QAction('Font', self)
+        font_menu.triggered.connect(self.set_font)
+        preference_menu.addAction(font_menu)
 
         about_menu = menu_bar.addMenu("Help")
         help_menu = QAction("About", self)
         help_menu.setShortcut('F7')
         help_menu.triggered.connect(self.about_app)
         about_menu.addAction(help_menu)
-
-        default_style = "font: 12pt 'Hack'; color: #111111;"
-        self.te_main.setStyleSheet(default_style)
 
         # Setting a vertical box layout
         vertical_box = QVBoxLayout()  # instantiating the QVBoxLayout
@@ -70,13 +91,32 @@ class QtNotePad(QMainWindow):
         central_widget.setLayout(vertical_box)
         self.setCentralWidget(central_widget)
 
+    def copy(self):
+        self.te_main.copy()
+        copyright()
+        credits()
+
+    def cut(self):
+        self.te_main.cut()
+
+    def set_font(self):
+        font, valid = QFontDialog().getFont()
+        if valid:
+            self.te_main.setFont(QFont(font))
+
+
+    def paste(self):
+        self.te_main.paste()
+
     def new(self):
         self.filename = None
-        self.te_main.setPlainText("")
+        self.file_open = False
+        self.te_main.clear()
 
     def open(self):
         self.te_main.setPlainText("")
         open_file = QFileDialog.getOpenFileName(self, 'Open')
+        self.file_open = True
         self.filename = open_file[0]
         try:
             o = open(self.filename, "r")
@@ -89,21 +129,26 @@ class QtNotePad(QMainWindow):
 
     def about_app(self):
         message = """
-        Peppercorn Notepad by Peppercorn build 2020.APR
-        Powered by Python 3 and PyQt5
-        \tgithub repository:
-        https://github.com/AnweshDahal/QtNotepad.git
+        <h3>Peppercorn Notepad by Peppercorn build 2020.APR</h3>
+        <b>Project</b>: Peppercorn Notepad<br>
+        <b>Build</b>: 2020.APR<br>
+        <b>Author</b>: Peppercorn<br>
+            <b>Team</b>: Anwesh Dahal<br>
+        <b>Github</b>: <a href="https://github.com/AnweshDahal/QtNotepad.git">https://github.com/AnweshDahal/QtNotepad.git</a>
         """
         QMessageBox.about(self, "About", message)
-
 
     def comment(self):
         self.te_main.insertHtml("# ")
 
     def save(self):
-        save_file = QFileDialog.getSaveFileName(self, 'Save')
+        save_file = None
+        if not self.file_open:
+            save_file = QFileDialog.getSaveFileName(self, 'Save')
+            self.filename = save_file[0]
+            self.file_open = True
         text_to_save = self.te_main.toPlainText()
-        self.filename = save_file[0]
+
         try:
             f = open(self.filename, "w+")
             f.write(text_to_save)
