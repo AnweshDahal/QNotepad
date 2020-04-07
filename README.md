@@ -20,7 +20,9 @@ However you can build this application on your own using your favourite python  
 or something.  
 
 *Known Bugs*
+```
 1. Save does not work in linux tested on:
+
 NAME="Ubuntu"
 
 VERSION="18.04.4 LTS (Bionic Beaver)"
@@ -33,16 +35,9 @@ PRETTY_NAME="Ubuntu 18.04.4 LTS"
 
 VERSION_ID="18.04"
 
-HOME_URL="https://www.ubuntu.com/"
-
-SUPPORT_URL="https://help.ubuntu.com/"
-
-BUG_REPORT_URL="https://bugs.launchpad.net/ubuntu/"
-
-PRIVACY_POLICY_URL="https://www.ubuntu.com/legal/terms-and-policies/privacy-policy"
-
 VERSION_CODENAME=bionic
 
 UBUNTU_CODENAME=bionic
+```
 
 *Tip: Create a virtual environment and install PyQt5. Don't upload the virtual environment usually called venv/ folder to this repository*
