@@ -11,6 +11,7 @@
 from PyQt5.QtWidgets import QWidget, QApplication, QMainWindow, QTextEdit, QVBoxLayout, QAction, QFileDialog
 from PyQt5.QtWidgets import QMessageBox, QFontDialog
 from PyQt5.QtGui import QIcon, QFont
+from PyQt5.QtCore import QSettings
 import sys
 
 
@@ -18,12 +19,34 @@ class QtNotePad(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
         # self refers to QMainWindow
+        self.settings = QSettings('Peppercorn', 'Peppercorn_Note_Pad')
         self.filename = None
         self.file_open = False
         self.te_main = QTextEdit(self)
         self.setWindowTitle("Peppercorn Notepad")
         self.setGeometry(100, 100, 800, 500)
         self.setMinimumSize(200, 200)
+
+        try:
+            self.resize(self.settings.value('window size'))
+            # print('sized')
+            self.move(self.settings.value('window location'))
+            # print('moved')
+            font = QFont()
+            # print('font')
+            font.setFamily(self.settings.value('font family'))
+            # print(str(self.settings.value('font family')))
+            font.setPointSize(int(self.settings.value('font size')))
+            # print(self.settings.value('font size'))
+            font.setBold(eval(self.settings.value('bold')))
+            # print(self.settings.value('bold'))
+            font.setItalic(eval(self.settings.value('italics')))
+            # print(self.settings.value('italics'))
+            font.setUnderline(eval(self.settings.value('underline')))
+            # print(self.settings.value('underline'))
+            self.te_main.setFont(font)
+        except:
+            pass
         self.build_ui()
 
     def build_ui(self):
@@ -136,7 +159,9 @@ class QtNotePad(QMainWindow):
             <b>Team</b>: Anwesh Dahal<br>
         <b>Github</b>: <a href="https://github.com/AnweshDahal/QtNotepad.git">https://github.com/AnweshDahal/QtNotepad.git</a>
         """
-        QMessageBox.about(self, "About", message)
+        about_dialog = QMessageBox()
+        about_dialog.about(self, "About", message)
+
 
     def comment(self):
         self.te_main.insertHtml("# ")
@@ -161,10 +186,20 @@ class QtNotePad(QMainWindow):
         window_title = "QtNotePad - " + self.filename
         self.setWindowTitle(window_title)
 
+    def closeEvent(self, event):
+        self.settings.setValue('window size', self.size())
+        self.settings.setValue('window location', self.pos())
+        self.settings.setValue('font family', str(self.te_main.font().family()))
+        print(str(self.te_main.font().family()))
+        self.settings.setValue('font size', str(self.te_main.font().pointSize()))
+        self.settings.setValue('bold', str(self.te_main.font().bold()))
+        self.settings.setValue('italics', str(self.te_main.font().italic()))
+        self.settings.setValue('underline', str(self.te_main.font().underline()))
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    app.setStyle('Fusion')
+    app.setStyle('Windows')
     main_window = QtNotePad()
     main_window.setWindowIcon(QIcon("logo.png"))
     main_window.show()
