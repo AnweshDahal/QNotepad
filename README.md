@@ -20,9 +20,8 @@ However you can build this application on your own using your favourite python  
 or something.  
 
 *Known Bugs*
-```
 1. Save does not work in linux tested on:
-
+```
 NAME="Ubuntu"
 
 VERSION="18.04.4 LTS (Bionic Beaver)"
